@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Birthday Surprise — for You ✨</title>
+    <style>
+      :root {
+        --bg1: #ff6fb4;
+        --bg2: #ffa26b;
+        --bg3: #ffd86b;
+        --card: #ffffff0f;
+        --card-br: #ffffff33;
+        --accent: #ff477e;
+        --accent-2: #ffcf6b;
+        --text: #fff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        color: var(--text);
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Poppins, Arial,
+          sans-serif;
+        background: radial-gradient(
+            1200px 800px at 10% 10%,
+            #ffffff22 0 40%,
+            transparent 55%
+          ),
+          radial-gradient(
+            900px 700px at 90% 20%,
+            #ffffff18 0 35%,
+            transparent 60%
+          ),
+          linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+        overflow-x: hidden;
+      }
+
+      /* subtle animated gradient shimmer */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: -50%;
+        background: conic-gradient(
+          from 0deg,
+          #fff2 0 10%,
+          transparent 10% 20%,
+          #fff2 20% 30%,
+          transparent 30% 40%,
+          #fff2 40% 50%,
+          transparent 50% 60%,
+          #fff2 60% 70%,
+          transparent 70% 80%,
+          #fff2 80% 90%,
+          transparent 90% 100%
+        );
+        filter: blur(40px) saturate(120%);
+        mix-blend-mode: soft-light;
+        animation: rotate 30s linear infinite;
+        pointer-events: none;
+      }
+      @keyframes rotate {
+        to {
+          transform: rotate(1turn);
+        }
+      }
+
+      .wrap {
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+      }
+      .card {
+        width: min(720px, 92vw);
+        border: 1px solid var(--card-br);
+        border-radius: 28px;
+        background: linear-gradient(180deg, #ffffff10, #ffffff08);
+        box-shadow: 0 20px 80px #00000040, inset 0 1px 0 #ffffff55;
+        padding: 32px 22px 28px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* floating hearts */
+      .hearts {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .hearts span {
+        position: absolute;
+        bottom: -40px;
+        font-size: 22px;
+        opacity: 0.7;
+        filter: drop-shadow(0 2px 6px #ff2f7040);
+        animation: float 9s linear infinite;
+      }
+      @keyframes float {
+        from {
+          transform: translateY(0) translateX(0) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.9;
+        }
+        to {
+          transform: translateY(-110vh) translateX(var(--x)) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      h1 {
+        margin: 8px 0 4px;
+        font-weight: 800;
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        letter-spacing: 0.5px;
+        background: linear-gradient(90deg, #fff, #fff, #fff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 1px 0 #ffffff66, 0 8px 24px #ff2f7066;
+      }
+      .subtitle {
+        opacity: 0.95;
+        margin: 0 0 18px;
+        font-weight: 500;
+      }
+
+      .svg-wrap {
+        display: grid;
+        place-items: center;
+        gap: 18px;
+        margin: 8px 0 10px;
+      }
+      .cake {
+        width: min(240px, 60vw);
+      }
+      .gift {
+        width: min(170px, 48vw);
+      }
+
+      .btn {
+        appearance: none;
+        border: none;
+        cursor: pointer;
+        user-select: none;
+        padding: 14px 18px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #fff;
+        background: linear-gradient(180deg, #ff517b, #e13f6b);
+        box-shadow: 0 10px 24px #ff2f7088, inset 0 1px 0 #ffffffaa;
+        transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        filter: saturate(115%);
+        box-shadow: 0 14px 28px #ff2f70aa, inset 0 1px 0 #fff;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      #surprise {
+        display: none;
+        margin-top: 10px;
+      }
+      #surprise.show {
+        display: block;
+      }
+
+      /* typewriter */
+      .type {
+        min-height: 26px;
+        font-size: 1.05rem;
+        opacity: 0.95;
+      }
+      .blink::after {
+        content: "|";
+        margin-left: 2px;
+        animation: blink 1s steps(1) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* glitter canvas */
+      #sparkles,
+      #confetti {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+      #confetti {
+        z-index: 2;
+      }
+
+      /* name bar */
+      .namebar {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+        margin: 8px 0 16px;
+      }
+      .input {
+        width: min(260px, 70vw);
+        padding: 11px 12px;
+        border-radius: 12px;
+        border: 1px solid #ffffff55;
+        background: #ffffff24;
+        color: #fff;
+        outline: none;
+        box-shadow: inset 0 1px 0 #ffffff55;
+        font-weight: 600;
+      }
+      .mini {
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: #ffffff2e;
+        color: #fff;
+        border: 1px solid #ffffff55;
+        font-weight: 700;
+      }
+      .mini:hover {
+        background: #ffffff40;
+      }
+
+      /* small footer note */
+      .note {
+        opacity: 0.85;
+        font-size: 0.9rem;
+        margin-top: 12px;
+      }
+
+      /* subtle glow around SVGs */
+      .glow {
+        filter: drop-shadow(0 6px 28px #ff7ab399)
+          drop-shadow(0 2px 8px #ffcf6b66);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="sparkles"></canvas>
+    <canvas id="confetti"></canvas>
+
+    <div class="wrap">
+      <div class="card">
+        <div class="hearts" id="hearts"></div>
+
+        <h1>🎉 Happy Birthday, <span id="who">Crush</span>! 🧁</h1>
+        <p class="subtitle type blink" id="type"></p>
+
+        <div class="namebar">
+          <input
+            id="nameInput"
+            class="input"
+            placeholder="Type name… e.g., Aashi"
+          />
+          <button class="mini" id="setName">Set Name</button>
+        </div>
+
+        <div class="svg-wrap">
+          <!-- cute minimal SVG cake -->
+          <svg
+            class="cake glow"
+            viewBox="0 0 260 260"
+            aria-label="Birthday Cake"
+            role="img"
+          >
+            <defs>
+              <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#fff1" />
+                <stop offset="1" stop-color="#0001" />
+              </linearGradient>
+              <linearGradient id="frost" x1="0" x2="1">
+                <stop offset="0" stop-color="#ffd6e8" />
+                <stop offset="1" stop-color="#fff0b3" />
+              </linearGradient>
+              <linearGradient id="base" x1="0" x2="1">
+                <stop offset="0" stop-color="#ff9ab6" />
+                <stop offset="1" stop-color="#ffbd80" />
+              </linearGradient>
+            </defs>
+            <!-- plate -->
+            <ellipse cx="130" cy="210" rx="90" ry="14" fill="#ffffff80" />
+            <!-- cake base -->
+            <rect
+              x="60"
+              y="120"
+              width="140"
+              height="70"
+              rx="16"
+              fill="url(#base)"
+            />
+            <!-- frosting drip -->
+            <path
+              d="M60,135 h140 v20 q-10 10 -20 0 q-10 -10 -20 0 q-10 10 -20 0 q-10 -10 -20 0 q-10 10 -20 0 q-10 -10 -20 0 v-20z"
+              fill="url(#frost)"
+            />
+            <!-- candles -->
+            <g>
+              <rect
+                x="95"
+                y="90"
+                width="10"
+                height="30"
+                rx="4"
+                fill="#8ad1ff"
+              />
+              <rect
+                x="125"
+                y="84"
+                width="10"
+                height="36"
+                rx="4"
+                fill="#ff94b4"
+              />
+              <rect
+                x="155"
+                y="92"
+                width="10"
+                height="28"
+                rx="4"
+                fill="#ffe28a"
+              />
+              <!-- flames -->
+              <g class="flame">
+                <path d="M100 86 q5 -12 10 0 q-5 6 -10 0" fill="#ffce54" />
+                <path d="M130 78 q5 -14 10 0 q-5 7 -10 0" fill="#ffce54" />
+                <path d="M160 88 q5 -12 10 0 q-5 6 -10 0" fill="#ffce54" />
+              </g>
+            </g>
+            <!-- glossy overlay -->
+            <rect
+              x="60"
+              y="120"
+              width="140"
+              height="70"
+              rx="16"
+              fill="url(#g1)"
+            />
+          </svg>
+
+          <button class="btn" id="open">Open Your Surprise 🎁</button>
+
+          <!-- gift box SVG (hidden until open) -->
+          <div id="surprise" aria-live="polite">
+            <h2 style="margin: 10px 0 6px; text-shadow: 0 6px 22px #00000040">
+              You are the sweetest gift in my life 💖
+            </h2>
+            <svg
+              class="gift glow"
+              viewBox="0 0 220 200"
+              aria-label="Gift Box"
+              role="img"
+            >
+              <defs>
+                <linearGradient id="giftA" x1="0" x2="1">
+                  <stop offset="0" stop-color="#ff6f91" />
+                  <stop offset="1" stop-color="#ffc36b" />
+                </linearGradient>
+                <linearGradient id="giftB" x1="0" x2="1">
+                  <stop offset="0" stop-color="#fff" />
+                  <stop offset="1" stop-color="#ffe8b8" />
+                </linearGradient>
+              </defs>
+              <!-- box -->
+              <rect
+                x="30"
+                y="70"
+                width="160"
+                height="100"
+                rx="12"
+                fill="url(#giftA)"
+              />
+              <!-- ribbon vertical -->
+              <rect x="100" y="70" width="20" height="100" fill="url(#giftB)" />
+              <!-- lid -->
+              <rect
+                x="20"
+                y="60"
+                width="180"
+                height="26"
+                rx="10"
+                fill="url(#giftA)"
+              />
+              <!-- ribbon horizontal -->
+              <rect x="20" y="70" width="180" height="12" fill="url(#giftB)" />
+              <!-- bow -->
+              <path
+                d="M110 52 c30 -32 54 -12 28 12 c-10 8 -20 10 -28 10 c-8 0 -18 -2 -28 -10 c-26 -24 -2 -44 28 -12z"
+                fill="url(#giftB)"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <p class="note">
+          Tip: Enter a name, then press <b>Open Your Surprise</b> for confetti +
+          glitter boost! ✨
+        </p>
+      </div>
+    </div>
+
+    <script>
+      /* ---------- Typewriter ---------- */
+      const line = "May your day be as beautiful as your smile ♥";
+      const typeEl = document.getElementById("type");
+      let idx = 0;
+      (function typeLoop() {
+        if (idx <= line.length) {
+          typeEl.textContent = line.slice(0, idx++);
+          setTimeout(typeLoop, 45);
+        } else {
+          typeEl.classList.remove("blink");
+        }
+      })();
+
+      /* ---------- Name personalize ---------- */
+      const who = document.getElementById("who");
+      document.getElementById("setName").addEventListener("click", () => {
+        const v = (document.getElementById("nameInput").value || "").trim();
+        if (v) who.textContent = v;
+      });
+
+      /* ---------- Surprise: show + confetti ---------- */
+      const surprise = document.getElementById("surprise");
+      document.getElementById("open").addEventListener("click", () => {
+        surprise.classList.add("show");
+        burstConfetti();
+      });
+
+      /* ---------- Floating Hearts ---------- */
+      const hearts = document.getElementById("hearts");
+      const heartChars = ["💖", "💗", "💞", "💘", "💕", "❤‍🔥", "🩷"];
+      function addHeart() {
+        const s = document.createElement("span");
+        s.textContent =
+          heartChars[Math.floor(Math.random() * heartChars.length)];
+        const x = Math.random() * 100;
+        const drift = Math.random() * 120 - 60 + "vw";
+        s.style.left = x + "vw";
+        s.style.setProperty("--x", drift);
+        s.style.fontSize = 18 + Math.random() * 26 + "px";
+        s.style.animationDuration = 8 + Math.random() * 6 + "s";
+        hearts.appendChild(s);
+        setTimeout(() => s.remove(), 15000);
+      }
+      setInterval(addHeart, 600);
+      for (let i = 0; i < 14; i++) setTimeout(addHeart, i * 200);
+
+      /* ---------- Sparkle / Glitter Canvas ---------- */
+      const spark = document.getElementById("sparkles");
+      const sctx = spark.getContext("2d");
+      let spx = [],
+        W,
+        H;
+      function size() {
+        W = spark.width = innerWidth;
+        H = spark.height = innerHeight;
+      }
+      addEventListener("resize", size);
+      size();
+      function newStar() {
+        return {
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: Math.random() * 1.6 + 0.4,
+          a: Math.random() * Math.PI * 2,
+          v: 0.15 + Math.random() * 0.35,
+          op: Math.random() * 0.6 + 0.2,
+        };
+      }
+      for (let i = 0; i < 200; i++) spx.push(newStar());
+      (function loop() {
+        sctx.clearRect(0, 0, W, H);
+        for (const p of spx) {
+          p.a += p.v * 0.02;
+          p.x += Math.cos(p.a) * 0.1;
+          p.y += Math.sin(p.a) * 0.1;
+          if (p.x < 0) p.x = W;
+          if (p.x > W) p.x = 0;
+          if (p.y < 0) p.y = H;
+          if (p.y > H) p.y = 0;
+          sctx.globalAlpha = Math.abs(Math.sin(p.a)) * p.op;
+          sctx.beginPath();
+          sctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          sctx.fillStyle = Math.random() < 0.5 ? "#fff" : "#ffe7a6";
+          sctx.fill();
+        }
+        requestAnimationFrame(loop);
+      })();
+
+      /* ---------- Confetti (no external lib) ---------- */
+      const c = document.getElementById("confetti");
+      const ctx = c.getContext("2d");
+      let cw, ch;
+      function resize() {
+        cw = c.width = innerWidth;
+        ch = c.height = innerHeight;
+      }
+      addEventListener("resize", resize);
+      resize();
+
+      let pieces = [];
+      function makePiece() {
+        const colors = [
+          "#fff",
+          "#ffe07a",
+          "#ff6f91",
+          "#7dd3fc",
+          "#fda4af",
+          "#c4b5fd",
+        ];
+        return {
+          x: Math.random() * cw,
+          y: -10 - Math.random() * ch * 0.25,
+          w: 6 + Math.random() * 6,
+          h: 10 + Math.random() * 10,
+          a: Math.random() * Math.PI * 2,
+          s: 0.8 + Math.random() * 1.6,
+          g: 0.08 + Math.random() * 0.12,
+          r: Math.random() * 0.2 + 0.02,
+          col: colors[Math.floor(Math.random() * colors.length)],
+          life: 220 + Math.random() * 80,
+        };
+      }
+      function burstConfetti() {
+        for (let i = 0; i < 180; i++) pieces.push(makePiece());
+        // sparkle boost
+        for (let i = 0; i < 80; i++) spx.push(newStar());
+        setTimeout(() => {
+          spx.splice(0, 80);
+        }, 4000);
+      }
+      (function confettiLoop() {
+        ctx.clearRect(0, 0, cw, ch);
+        pieces = pieces.filter((p) => p.life > 0);
+        for (const p of pieces) {
+          p.life -= 1.5;
+          p.y += p.s;
+          p.x += Math.sin(p.a) * 0.6;
+          p.a += p.r;
+          p.s += p.g * 0.02;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.a);
+          ctx.fillStyle = p.col;
+          ctx.globalAlpha = Math.max(0, Math.min(1, p.life / 300));
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        }
+        requestAnimationFrame(confettiLoop);
+      })();
+    </script>
+  </body>
+</html>
